@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      .grid-container {
+        display: grid;
+        grid-template-columns: 1fr 5fr;
+        grid-gap: 10px;
+        width: 100vw;
+        height: 100vh;
+      }
+
+      .grid-item {
+        background-color: lightblue;
+        resize: both; /* Enables resizing for the element */
+        overflow: auto; /* Enables scrolling if content overflows when resizing */
+        position: relative; /* Needed for the absolute-positioned drag trigger */
+      }
+
+      .drag-trigger {
+        width: 100%;
+        height: 30px;
+        background-color: rgba(0, 0, 0, 0.3);
+        cursor: move;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="grid-container">
+      <div class="grid-item" id="resizable-element1">
+        <div
+          class="drag-trigger"
+          draggable="true"
+          ondragstart="drag(event, 'resizable-element1')"
+        ></div>
+        <p>Resizable Element 1</p>
+      </div>
+      <div class="grid-item" id="resizable-element2">
+        <div
+          class="drag-trigger"
+          draggable="true"
+          ondragstart="drag(event, 'resizable-element2')"
+        ></div>
+        <p>Resizable Element 2</p>
+      </div>
+    </div>
+
+    <script>
+      function drag(event, elementId) {
+        event.dataTransfer.setData('text/plain', elementId);
+      }
+
+      document.addEventListener('dragover', function (event) {
+        event.preventDefault();
+      });
+
+      document.addEventListener('drop', function (event) {
+        event.preventDefault();
+        const data = event.dataTransfer.getData('text');
+        const targetElement = event.target.closest('.grid-item');
+
+        if (targetElement) {
+          const gridContainer = document.querySelector('.grid-container');
+          const elements = Array.from(gridContainer.children);
+
+          const targetIndex = elements.indexOf(targetElement);
+          const sourceIndex = elements.findIndex(
+            (element) => element.id === data
+          );
+
+          if (targetIndex !== sourceIndex) {
+            // Swap elements in the grid
+            gridContainer.insertBefore(elements[sourceIndex], targetElement);
+          }
+        }
+      });
+    </script>
+  </body>
+</html>
